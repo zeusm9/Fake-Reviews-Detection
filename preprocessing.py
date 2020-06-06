@@ -5,7 +5,6 @@ import nltk
 import os
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
 from os import walk
 
