@@ -67,16 +67,16 @@ def preprocess(filepaths):
                 folder = "truth"
             write_file(str(c.CLEANED_DIR / folder / str(folder + ".txt")), ' '.join(cleaned))
 
-def preprocess_liar(fake,truth):
+def preprocess_liar(fake,truth,outpu_fake,output_truth):
     for line in fake:
-        write_file(str(c.LIAR_FAKE), ' '.join(line))
+        write_file(str(outpu_fake), ' '.join(line))
     for line in truth:
-        write_file(str(c.LIAR_TRUTH),' '.join(line))
+        write_file(str(output_truth),' '.join(line))
 
 
 def main():
     fake_liar, truth_liar = read_tsv(c.LIAR_CORPUS)
-    preprocess_liar(fake_liar,truth_liar)
+    preprocess_liar(fake_liar,truth_liar,c.LIAR_FAKE,c.LIAR_TRUTH)
     #fake, truth = load_dataset(c.DATA_DIR)
     #preprocess(fake)
     #preprocess(truth)

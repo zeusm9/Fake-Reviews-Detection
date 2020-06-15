@@ -5,7 +5,7 @@ import numpy as np
 from sklearn import naive_bayes
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_validate
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, SVC
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -15,32 +15,35 @@ from sklearn.metrics import (
 )
 
 
-def train_svm(X_train, y_train,vectorizer, c: float = 1.0, max_iter: int = 1000):
-    X_train,vectorizer = utils.feature_extraction(X_train, max_features=10000, vectorizer_type=vectorizer)
-    svm_model = LinearSVC(C=c, max_iter=max_iter, dual=False)
+def train_svm(X_train, y_train, vectorizer, type="normal", c: float = 1.0, max_iter: int = 1000):
+    X_train, vectorizer = utils.feature_extraction(X_train, max_features=10000, vectorizer_type=vectorizer)
+    if type == "normal":
+        svm_model = SVC(C=c, max_iter=max_iter)
+    else:
+        svm_model = LinearSVC(C=c, max_iter=max_iter, dual=False)
     print("Cross Validation ...")
     train_linear(svm_model, X_train, y_train)
     print("\nFitting ...")
     svm_model.fit(X_train, y_train)
-    return svm_model,vectorizer
+    return svm_model, vectorizer
 
 
-def train_NB(X_train, y_train,vectorizer):
-    X_train,vectorizer = utils.feature_extraction(X_train, max_features=10000, vectorizer_type=vectorizer)
+def train_NB(X_train, y_train, vectorizer):
+    X_train, vectorizer = utils.feature_extraction(X_train, max_features=10000, vectorizer_type=vectorizer)
     naive_model = naive_bayes.MultinomialNB()
     print("\nCross validation ...")
     train_linear(naive_model, X_train, y_train)
     print("\nFitting")
     naive_model.fit(X_train, y_train)
-    return naive_model,vectorizer
+    return naive_model, vectorizer
 
 
 def train_knn(X_train, y_train, vectorizer_type):
-    X_train,vectorizer = utils.feature_extraction(X_train, max_features=10000, vectorizer_type=vectorizer_type)
+    X_train, vectorizer = utils.feature_extraction(X_train, max_features=10000, vectorizer_type=vectorizer_type)
     model = KNeighborsClassifier(n_neighbors=10)
     train_linear(model, X_train, y_train)
     model.fit(X_train, y_train)
-    return model,vectorizer
+    return model, vectorizer
 
 
 def train_linear(model, X_train, y_train):
@@ -74,14 +77,15 @@ def validation(train_x, train_y, estimator, cv, scoring):
 
 
 def main():
-    VECTORIZER_TYPE = "tf-idf"
+    VECTORIZER_TYPE = "tf-"
 
     X, y = utils.read_corpus(c.FAKE_CORPUS, c.TRUTH_CORPUS)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42,shuffle=True)
-    #model,vectorizer = train_svm(X_train, y_train, VECTORIZER_TYPE)
-    model,vectorizer = train_knn(X_train,y_train,VECTORIZER_TYPE)
-    evaluation.evaluate_linear(model, vectorizer ,X_test, y_test)
-
+    X_val, y_val = utils.read_corpus(c.LIAR_FAKE, c.LIAR_TRUTH)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True)
+    model, vectorizer = train_svm(X_train, y_train, VECTORIZER_TYPE,"norma",c=1.1,max_iter=10000)
+    # model,vectorizer = train_knn(X_train,y_train,VECTORIZER_TYPE)
+    #utils.plot_confusion(model,X_test,y_test)
+    evaluation.evaluate_linear(model, vectorizer, X_test, y_test)
 
 if __name__ == "__main__":
     main()
