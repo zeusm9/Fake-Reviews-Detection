@@ -12,16 +12,32 @@ nltk.download('stopwords')
 
 
 def read_file(inputfile: str):
+    """
+        Read file
+        :param inputfile: input path
+        :return:
+    """
     with open(inputfile, 'r', encoding='utf-8') as f:
         return [line.strip() for line in f if f]
 
 
-def write_file(outputfile: str, review):
+def write_file(outputfile: str, reviews):
+    """
+        Write file
+        :param outputfile: output path
+        :param reviews: list of reviews
+        :return:
+    """
     with open(outputfile, 'a', encoding='utf-8') as f:
-        f.writelines(review + '\n')
+        f.writelines(reviews + '\n')
 
 
 def read_tsv(inputfile: str):
+    """
+        Read tsv file
+        :param inputfile: input path
+        :return list of fake documents, list of truth documents:
+    """
     fake = []
     truth = []
     with open(inputfile, 'r', encoding='utf-8') as f:
@@ -37,6 +53,11 @@ def read_tsv(inputfile: str):
 
 
 def clean_text(inputext):
+    """
+        Clean text removing stop words, punctuation, non alphanumeric characters and digits
+        :param inputext: line of text
+        :return: list of cleaned tokens
+    """
     lmtzr = WordNetLemmatizer()
     tokens = word_tokenize(inputext.lower())
     stops = set(stopwords.words('english')) | set(string.punctuation)
@@ -45,6 +66,11 @@ def clean_text(inputext):
 
 
 def load_dataset(datapath):
+    """
+        Find path of files
+        :param datapath: path of dataset
+        :return: fake file paths, truth file paths
+    """
     fake = []
     truth = []
     for (dirpath, dirnames, filenames) in walk(datapath):
@@ -56,6 +82,11 @@ def load_dataset(datapath):
 
 
 def preprocess(filepaths):
+    """
+        Clean and write file
+        :param filepaths: list of file paths
+        :return:
+    """
     for filepath in filepaths:
         f = read_file(filepath)
 
@@ -68,6 +99,14 @@ def preprocess(filepaths):
             write_file(str(c.CLEANED_DIR / folder / str(folder + ".txt")), ' '.join(cleaned))
 
 def preprocess_liar(fake,truth,outpu_fake,output_truth):
+    """
+        Preprocess liar dataset
+        :param fake: list of fake documents
+        :param truth: list of truth documents
+        :param outpu_fake: output path for fake
+        :param output_truth: output path for truth
+        :return:
+    """
     for line in fake:
         write_file(str(outpu_fake), ' '.join(line))
     for line in truth:
@@ -77,9 +116,9 @@ def preprocess_liar(fake,truth,outpu_fake,output_truth):
 def main():
     fake_liar, truth_liar = read_tsv(c.LIAR_CORPUS)
     preprocess_liar(fake_liar,truth_liar,c.LIAR_FAKE,c.LIAR_TRUTH)
-    #fake, truth = load_dataset(c.DATA_DIR)
-    #preprocess(fake)
-    #preprocess(truth)
+    fake, truth = load_dataset(c.DATA_DIR)
+    preprocess(fake)
+    preprocess(truth)
 
 
 if __name__ == "__main__":

@@ -3,10 +3,15 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.metrics import plot_confusion_matrix
 
 
 def read_corpus(fake_corpus, truth_corpus):
+    """
+        Read corpus from txt file
+        :param fake_corpus: path to fake file
+        :param truth_corpus: path to truth file
+        :return: list of input documents, labels
+    """
     target = []
     with open(fake_corpus, 'r', encoding='utf-8') as f, open(truth_corpus, 'r', encoding='utf-8') as t:
         fake = f.readlines()
@@ -20,16 +25,29 @@ def read_corpus(fake_corpus, truth_corpus):
 
 
 def feature_extraction(trainX, vectorizer_type, max_features=10000):
+    """
+        Extract features from documents
+        :param trainX: input train
+        :param vectorizer_type: type of vectorizer: tf or tf-idf
+        :return: vectors of features for train, vectorizer
+    """
     if vectorizer_type == "tf":
         vectorizer = CountVectorizer(ngram_range=(1, 2), max_features=max_features, min_df=1)
     else:
-        vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1, 3), max_features=max_features, min_df=3)
+        vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1, 2), max_features=max_features, min_df=1)
 
     trainX = vectorizer.fit_transform(trainX)
     return trainX, vectorizer
 
 
-def plot_clusters(X):
+def plot_clusters(X,vectorizer):
+    """
+        Plot clusters using reducing dimension with k-means and pca
+        :param X: input dataset
+        :param vectorizer: vectorizer
+        :return:
+    """
+    X = vectorizer.transform(X)
     NUMBER_OF_CLUSTERS = 2
     km = KMeans(
         n_clusters=NUMBER_OF_CLUSTERS,
@@ -64,22 +82,4 @@ def plot_clusters(X):
     ax.legend()
     plt.xlabel("PCA 0")
     plt.ylabel("PCA 1")
-    plt.show()
-
-
-def plot_confusion(clf, X_test, y_test):
-    np.set_printoptions(precision=2)
-    class_names = ["fake", "truth"]
-    # Plot non-normalized confusion matrix
-    titles_options = [("Confusion matrix, without normalization", None),
-                      ("Normalized confusion matrix", 'true')]
-    for title, normalize in titles_options:
-        disp = plot_confusion_matrix(clf, X_test, y_test,
-                                     display_labels=class_names,
-                                     cmap=plt.cm.Blues)
-        disp.ax_.set_title(title)
-
-        print(title)
-        print(disp.confusion_matrix)
-
     plt.show()

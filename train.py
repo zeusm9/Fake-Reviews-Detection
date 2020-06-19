@@ -15,8 +15,20 @@ from sklearn.metrics import (
 )
 
 
-def train_svm(X_train, y_train, vectorizer, type="normal", c: float = 1.0, max_iter: int = 1000):
-    X_train, vectorizer = utils.feature_extraction(X_train, max_features=10000, vectorizer_type=vectorizer)
+def train_svm(X_train, y_train, vectorizer, type="normal", c: float = 1.0, max_iter: int = 1000,
+              max_features: int = 1000):
+    """
+        Used to train a svm classifier
+        :param X_train: input train
+        :param y_train: label train
+        :param vectorizer: type of vectorizer
+        :param type : type of svm (linear, not linear)
+        :param c: regularization parameter
+        :param max_iter : maximum iterations
+        :param max_features : maximum number of features
+        :return: svm model, features vectorizer
+    """
+    X_train, vectorizer = utils.feature_extraction(X_train, max_features=max_features, vectorizer_type=vectorizer)
     if type == "normal":
         svm_model = SVC(C=c, max_iter=max_iter)
     else:
@@ -28,8 +40,16 @@ def train_svm(X_train, y_train, vectorizer, type="normal", c: float = 1.0, max_i
     return svm_model, vectorizer
 
 
-def train_NB(X_train, y_train, vectorizer):
-    X_train, vectorizer = utils.feature_extraction(X_train, max_features=10000, vectorizer_type=vectorizer)
+def train_NB(X_train, y_train, vectorizer, max_features: int = 1000):
+    """
+        Used to train a naive bayes classifier
+        :param X_train: input train
+        :param y_train: label train
+        :param vectorizer: type of vectorizer
+        :param max_features : maximum number of features
+        :return: naive bayes model, features vectorizer
+    """
+    X_train, vectorizer = utils.feature_extraction(X_train, max_features=max_features, vectorizer_type=vectorizer)
     naive_model = naive_bayes.MultinomialNB()
     print("\nCross validation ...")
     train_linear(naive_model, X_train, y_train)
@@ -38,8 +58,17 @@ def train_NB(X_train, y_train, vectorizer):
     return naive_model, vectorizer
 
 
-def train_knn(X_train, y_train, vectorizer_type):
-    X_train, vectorizer = utils.feature_extraction(X_train, max_features=10000, vectorizer_type=vectorizer_type)
+def train_knn(X_train, y_train, vectorizer_type, max_features: int = 1000):
+    """
+        Used to train a k-nn classifier
+        :param X_train: input train
+        :param y_train: label train
+        :param vectorizer_type: type of vectorizer
+        :param max_features : maximum number of features
+        :return: naive bayes model, features vectorizer
+    """
+
+    X_train, vectorizer = utils.feature_extraction(X_train, max_features=max_features, vectorizer_type=vectorizer_type)
     model = KNeighborsClassifier(n_neighbors=10)
     train_linear(model, X_train, y_train)
     model.fit(X_train, y_train)
@@ -47,6 +76,13 @@ def train_knn(X_train, y_train, vectorizer_type):
 
 
 def train_linear(model, X_train, y_train):
+    """
+        Used to evaluate and compute metrics with k-fold cross validation
+        :param model: model to evaluate
+        :param X_train: input train
+        :param y_train: label train
+        :return:
+    """
     scoring = {
         "accuracy": make_scorer(accuracy_score),
         "precision": make_scorer(precision_score, pos_label=1),
@@ -65,6 +101,15 @@ def train_linear(model, X_train, y_train):
 
 
 def validation(train_x, train_y, estimator, cv, scoring):
+    """
+        Used to evaluate and compute metrics with k-fold cross validation
+        :param train_x: input train
+        :param train_y: label train
+        :param estimator: trained model
+        :param cv : type of cross validation
+        :param scoring: metrics to display
+        :return: mean of the metrics
+    """
     scores = cross_validate(
         estimator, train_x, train_y, cv=cv, scoring=scoring, n_jobs=-1
     )
@@ -77,15 +122,16 @@ def validation(train_x, train_y, estimator, cv, scoring):
 
 
 def main():
-    VECTORIZER_TYPE = "tf-"
-
+    VECTORIZER_TYPE = "tf-idf"
+    MAX_FEATURES = 50000
+    SVM_TYPE = "linear"
+    C = 1.1
     X, y = utils.read_corpus(c.FAKE_CORPUS, c.TRUTH_CORPUS)
-    X_val, y_val = utils.read_corpus(c.LIAR_FAKE, c.LIAR_TRUTH)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True)
-    model, vectorizer = train_svm(X_train, y_train, VECTORIZER_TYPE,"norma",c=1.1,max_iter=10000)
-    # model,vectorizer = train_knn(X_train,y_train,VECTORIZER_TYPE)
-    #utils.plot_confusion(model,X_test,y_test)
-    evaluation.evaluate_linear(model, vectorizer, X_test, y_test)
+    model1, vectorizer = train_svm(X, y, VECTORIZER_TYPE, max_features=MAX_FEATURES, type=SVM_TYPE, c=C, max_iter=10000)
+    evaluation.evaluate_linear(model1, vectorizer, X_test, y_test)
+    utils.plot_clusters(X, vectorizer)
+
 
 if __name__ == "__main__":
     main()

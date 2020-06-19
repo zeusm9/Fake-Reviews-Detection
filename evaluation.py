@@ -6,19 +6,34 @@ import matplotlib.pyplot as plt
 
 
 def evaluate_linear(model, vectorizer, X_test, y_test):
+    """
+        Used to compute show metrics, plot confusion matrix and roc curve
+        :param model: trained model
+        :param vectorizer: features vectorizer
+        :param X_test: input test
+        :param y_test : label test
+        :return:
+    """
     X_test = vectorizer.transform(X_test)
     y_pred = model.predict(X_test)
     print("Accuracy Score:", accuracy_score(y_pred, y_test) * 100)
-    cr = classification_report(y_test, y_pred, [1, 0])
+    cr = classification_report(y_test, y_pred, [0, 1])
     print("Classification report : \n", cr)
     cm = confusion_matrix(y_test, y_pred)
     print("Confusion matrix : \n", cm)
-    ax = sns.heatmap(cm, annot=True, fmt='g')
+    labels = ["f","t"]
+    ax = sns.heatmap(cm, annot=True, fmt='g',xticklabels=labels,yticklabels=labels)
     plt.show()
     print_roc(y_test, y_pred)
 
 
 def print_roc(y_test, preds):
+    """
+        Used to plot roc curve
+        :param y_test: test labels
+        :param preds: predictions
+        :return:
+    """
     n_classes = 2
     fpr = dict()
     tpr = dict()
