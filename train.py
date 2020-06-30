@@ -128,9 +128,9 @@ def main():
     C = 1.1
     X, y = utils.read_corpus(c.FAKE_CORPUS, c.TRUTH_CORPUS)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True)
-    model1, vectorizer = train_svm(X, y, VECTORIZER_TYPE, max_features=MAX_FEATURES, type=SVM_TYPE, c=C, max_iter=10000)
+    model1, vectorizer = train_svm(X_train, y_train, VECTORIZER_TYPE, max_features=MAX_FEATURES, type=SVM_TYPE, c=C, max_iter=10000)
     evaluation.evaluate_linear(model1, vectorizer, X_test, y_test)
-    utils.plot_clusters(X, vectorizer)
+    utils.plot_clusters(X_test, vectorizer)
 
 
 if __name__ == "__main__":

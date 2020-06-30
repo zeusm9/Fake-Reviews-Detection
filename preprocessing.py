@@ -33,7 +33,7 @@ def write_file(outputfile: str, reviews):
 
 
 def read_tsv(inputfile: str):
-    """
+    """args command line
         Read tsv file
         :param inputfile: input path
         :return list of fake documents, list of truth documents:
@@ -114,8 +114,6 @@ def preprocess_liar(fake,truth,outpu_fake,output_truth):
 
 
 def main():
-    fake_liar, truth_liar = read_tsv(c.LIAR_CORPUS)
-    preprocess_liar(fake_liar,truth_liar,c.LIAR_FAKE,c.LIAR_TRUTH)
     fake, truth = load_dataset(c.DATA_DIR)
     preprocess(fake)
     preprocess(truth)
