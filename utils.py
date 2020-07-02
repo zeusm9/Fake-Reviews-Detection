@@ -40,7 +40,7 @@ def feature_extraction(trainX, vectorizer_type, max_features=10000):
     return trainX, vectorizer
 
 
-def plot_clusters(X,vectorizer):
+def plot_clusters(X, vectorizer):
     """
         Plot clusters using reducing dimension with k-means and pca
         :param X: input dataset

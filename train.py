@@ -2,6 +2,7 @@ import config as c
 import utils
 import evaluation
 import numpy as np
+import random
 from sklearn import naive_bayes
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_validate
 from sklearn.neighbors import KNeighborsClassifier
@@ -127,8 +128,9 @@ def main():
     SVM_TYPE = "linear"
     C = 1.1
     X, y = utils.read_corpus(c.FAKE_CORPUS, c.TRUTH_CORPUS)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True)
-    model1, vectorizer = train_svm(X_train, y_train, VECTORIZER_TYPE, max_features=MAX_FEATURES, type=SVM_TYPE, c=C, max_iter=10000)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True, stratify=y)
+    model1, vectorizer = train_svm(X_train, y_train, VECTORIZER_TYPE, max_features=MAX_FEATURES, type=SVM_TYPE, c=C,
+                                   max_iter=10000)
     evaluation.evaluate_linear(model1, vectorizer, X_test, y_test)
     utils.plot_clusters(X_test, vectorizer)
 
